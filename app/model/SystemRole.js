@@ -1,12 +1,18 @@
 module.exports = app => {
-  const { INTEGER, BOOLEAN, STRING } = app.Sequelize;
-  const SystemRoles = app.model.define('system_roles', {
-    rid: {type: INTEGER, primaryKey: true}, // 角色id
-    name: STRING, // 角色名称
-    describe: STRING, // 角色描述
-    status: {type: BOOLEAN, defaultValue: true} // 用户状态 false禁用 true启用
+  const { UUID, STRING, DATE, INTEGER } = app.Sequelize;
+  const SystemRole = app.model.define('system_role', {
+    role_id: { type: UUID, autoIncrement: true, primaryKey: true }, // 角色id
+    role_name: STRING, // 角色名称
+    description: STRING, // 角色描述
+    status: INTEGER, // 状态 0启用 1禁用
+    create_name: STRING, // 创建人名称
+    modify_name: STRING, // 变更人名称
+    create_time: DATE, // 创建时间
+    modify_time: DATE, // 变更时间
   }, {
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true
   });
-  return SystemRoles;
+
+  return SystemRole;
 }

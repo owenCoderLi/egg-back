@@ -11,7 +11,7 @@ module.exports = {
 
   // get token
   getAccessToken() {
-    const bearerToken = this.ctx.request.header.authorization
+    const bearerToken = this.ctx.request.header["x-apihub-token"];
     return bearerToken && bearerToken.replace("Bearer", "")
   },
 
