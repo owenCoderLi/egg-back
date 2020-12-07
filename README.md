@@ -1,33 +1,24 @@
-# dash
-
-
+# egg.js 管理后台后端栈
 
 ## QuickStart
 
-<!-- add docs here for user -->
-
-see [egg docs][egg] for more detail.
-
-### Development
-
 ```bash
+$ npm init --template=simple
 $ npm i
 $ npm run dev
 $ open http://localhost:7001/
 ```
 
-### Deploy
+```javascript
+// 采用的是 mysql + sequelize
+// 在config/plugins中, 配置sequelize / jwt
+// 因为是采用本地开发，所以在接口调试时会有跨域问题，根据官方文档可以在 指定环境下的文件, 将
+  config.security = {
+    csrf: false
+  }
 
-```bash
-$ npm start
-$ npm stop
+  config.sequelize = {
+    //  配置数据库的基本信息
+  }
+// 
 ```
-
-### npm scripts
-
-- Use `npm run lint` to check code style.
-- Use `npm test` to run unit test.
-- Use `npm run autod` to auto detect dependencies upgrade, see [autod](https://www.npmjs.com/package/autod) for more detail.
-
-
-[egg]: https://eggjs.org
