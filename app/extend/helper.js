@@ -1,5 +1,4 @@
 const crypto = require("crypto")
-const dayjs = require("dayjs")
 
 module.exports = {
   // create token

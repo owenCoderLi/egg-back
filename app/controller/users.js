@@ -5,7 +5,7 @@ class UserController extends Controller {
   async userLogin() { // 用户登录
     const {username, password} = this.ctx.request.body;
     const keys = this.config.keys;
-    let results = ""
+    let results = {}
     const user = await this.ctx.service.login.findUsername(username);
     if(!user || user.status === "2") {
       results = { code: 1, message: "用户名不存在" }

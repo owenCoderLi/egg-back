@@ -11,15 +11,14 @@ class LoginService extends Service {
   }
 
   async createUser(pass) {
-    const {username} = this.ctx.request.body;
+    const {username, email, phone, status} = this.ctx.request.body;
     const user = await this.ctx.model.SystemUser.create({
       user_name: username,
       password: pass,
-      email: 'liqipeng@yuediaoyan.com',
-      phone: '13929377188',
-      status: 0,
-      create_name: username,
-      modify_name: username,
+      email: email,
+      phone: phone,
+      status: status,
+      create_name: this.ctx.session.user.user_name,
     }, {
       timestamps: false,
       tableName: 'system_user'
