@@ -104,40 +104,12 @@ class ControlService extends Service {
     return result;
   }
 
-  async createUser() { // 新增用户
-    const {
-      user_name, dept_id, role_id,
-      status, email, phone,
-    } = this.ctx.request.body;
-    const keys = this.config.keys
-    const newPass = await cryptoMd5(password, keys);
-    const result = await this.ctx.model.SystemUser.create({
-      password: newPass,
-      user_name: user_name,
-      dept_id: dept_id,
-      role_id: role_id,
-      email: email,
-      phone: phone,
-      status: status,
-      create_name: this.ctx.session.user.user_name,
-      create_time: new Date()
-    }, {
-      timestamps: false,
-      tableName: 'system_user'
-    });
-    const userResult = result.get({plain: true});
-    return userResult;
-  }
-
   async updateUser() { // 更新用户
     const {
       user_name, dept_id, role_id,
-      status, email, phone, id
+      status, email, phone, user_id
     } = this.ctx.request.body;
-    const keys = this.config.keys
-    const newPass = await cryptoMd5(password, keys);
     const result = await this.ctx.model.SystemUser.update({
-      password: newPass,
       user_name: user_name,
       dept_id: dept_id,
       role_id: role_id,
@@ -147,7 +119,7 @@ class ControlService extends Service {
       modify_name: this.ctx.session.user.user_name,
       modify_time: new Date()
     },{
-      where: { "user_id": id }
+      where: { "user_id": user_id }
     });
     return result;
   }
@@ -189,6 +161,36 @@ class ControlService extends Service {
     })
     return result;
   }
+
+  async createRoleMenu(id) { // 映射'菜单-角色'关系
+    const {perms} = this.ctx.request.body;
+    let roleMenuList = [];
+    perms.map(item => {
+      let obj = {};
+      obj.role_id = id;
+      obj.menu_id = item;
+      roleMenuList.push(obj);
+    })
+    const result = await this.ctx.model.SystemRoleMenu.bulkCreate(
+      roleMenuList,
+      {timestamps: false, tableName: 'system_role_menu'}
+    );
+    return result;
+  }
+
+  async createUserRole(id) {
+    const {role_id} = this.ctx.request.body;
+    const result = await this.ctx.model.SystemUserRole.create({
+      user_id: id,
+      role_id: role_id
+    }, {
+      timestamps: false,
+      tableName: 'system_user_role'
+    })
+    const userResult = result.get({plain: true});
+    return userResult;
+  }
+
 }
 
 module.exports = ControlService;

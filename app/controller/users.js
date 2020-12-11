@@ -33,7 +33,12 @@ class UserController extends Controller {
     const newPass = await cryptoMd5(password, keys);
     const userResult = await this.ctx.service.login.createUser(newPass);
     if(Object.keys(userResult).length) {
-      results = {code: 0, msg: "success"}
+      const res = await this.ctx.service.control.createUserRole(userResult.user_id); // 创建映射.菜单 - 用户
+      if(res.length) {
+        results = {code: 0, msg: "add user success"}
+      } else {
+        results = {code: 1, msg: "add user failure"}
+      }
     } else {
       results = {code: 1, msg: 'add fail'}
     }

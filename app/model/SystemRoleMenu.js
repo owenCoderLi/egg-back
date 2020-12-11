@@ -7,6 +7,7 @@ module.exports = app => {
     timestamps: false,
     freezeTableName: true
   });
+  SystemRoleMenu.removeAttribute('id');
 
   return SystemRoleMenu;
 }

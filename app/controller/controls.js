@@ -48,9 +48,14 @@ class ControlController extends Controller {
 
   async roleAdd() { // 新增角色
     let results = {}
-    const result = await this.ctx.service.control.createRole();
+    const result = await this.ctx.service.control.createRole(); // 创建角色回调
     if(Object.keys(result).length) {
-      results = {code: 0, msg: 'add role success'};
+      const res = await this.ctx.service.control.createRoleMenu(result.role_id); // 创建映射.菜单 - 角色
+      if(res.length) {
+        results = {code: 0, msg: 'add role success'};
+      } else {
+        results = {code: 1, msg: 'add role failure'};
+      }
     } else {
       results = {code: 1, msg: 'add role failure'};
     }
@@ -64,17 +69,6 @@ class ControlController extends Controller {
       results = {code: 0, msg: 'update role success'}
     } else {
       results = {code: 1, msg: 'update role failure'}
-    }
-    this.ctx.body = results
-  }
-
-  async userAdd() { // 新增用户
-    let results = {}
-    const result = await this.ctx.service.control.createUser()
-    if(Object.keys(result).length) {
-      result = {code: 0, msg: 'add user success'}
-    } else {
-      results = {code: 1, msg: 'add user failure'}
     }
     this.ctx.body = results
   }
@@ -128,6 +122,7 @@ class ControlController extends Controller {
   async userList() { // 用户列表
     let results = {}
     const result = await this.ctx.service.control.userList()
+    // 查role_id对应的role_name 跟 dept_id对应的dept_name
     if(result.length) {
       results = {code: 0, msg: 'query user success', data: result}
     } else {

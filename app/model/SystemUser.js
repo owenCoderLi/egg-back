@@ -15,6 +15,5 @@ module.exports = app => {
     timestamps: false,
     freezeTableName: true
   });
-
   return SystemUser;
 }
