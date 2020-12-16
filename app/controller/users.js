@@ -27,14 +27,14 @@ class UserController extends Controller {
   }
 
   async userRegister() { // 用户注册
-    const {password} = this.ctx.request.body;
+    // const {password} = this.ctx.request.body; 新用户默认密码yuediaoyan
     let results = {}
     const keys = this.config.keys
-    const newPass = await cryptoMd5(password, keys);
+    const newPass = await cryptoMd5('yuediaoyan', keys);
     const userResult = await this.ctx.service.login.createUser(newPass);
     if(Object.keys(userResult).length) {
       const res = await this.ctx.service.control.createUserRole(userResult.user_id); // 创建映射.菜单 - 用户
-      if(res.length) {
+      if(Object.keys(res).length) {
         results = {code: 0, msg: "add user success"}
       } else {
         results = {code: 1, msg: "add user failure"}
@@ -47,19 +47,20 @@ class UserController extends Controller {
 
   async userInfo() { // 查询个人信息
     const token = await this.ctx.helper.getAccessToken()
-    let results = {}
+    let verifyRes = {};
+    let results = {};
     await this.ctx.app.jwt.verify(token, this.ctx.app.config.jwt.secret, function(err, decoded) {
       if(err) {
-        results.verify = false
-        results.message = err.message
+        verifyRes.verify = false
+        verifyRes.message = err.message
       } else {
-        results.verify = true
-        results.message = decoded
+        verifyRes.verify = true
+        verifyRes.message = decoded
       }
     })
-    const userInfo = await this.ctx.service.login.getUserInfo(results)
-    this.ctx.session.user = userInfo
-    if(Object.keys(userInfo).length) {
+    const userInfo = await this.ctx.service.login.getUserInfo(verifyRes)
+    if(userInfo && Object.keys(userInfo).length) {
+      this.ctx.session.user = userInfo
       results = {
         code: 0, msg: 'success',
         data: {

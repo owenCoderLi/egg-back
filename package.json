@@ -21,6 +21,7 @@
     "egg-sequelize": "^6.0.0",
     "eslint": "^5.13.0",
     "eslint-config-egg": "^7.1.0",
+    "lodash": "^4.17.20",
     "mysql2": "^2.2.5",
     "sequelize-cli": "^6.2.0"
   },

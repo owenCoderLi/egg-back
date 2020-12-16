@@ -91,28 +91,30 @@ class ControlService extends Service {
   }
 
   async updateRole() { // 更新角色
-    const {id, role_name, description, status} = this.ctx.request.body;
-    const result = await this.ctx.model.SystemMenu.update({
+    const {role_id, role_name, description, status} = this.ctx.request.body;
+    console.log('------------');
+    console.log(this.ctx.request.body);
+    const result = await this.ctx.model.SystemRole.update({
       role_name: role_name,
       description: description,
       status: status,
       modify_name: this.ctx.session.user.user_name,
       modify_time: new Date()
     },{
-      where: { "role_id": id }
+      where: { "role_id": role_id }
     });
     return result;
   }
 
   async updateUser() { // 更新用户
     const {
-      user_name, dept_id, role_id,
+      user_name, department, role,
       status, email, phone, user_id
     } = this.ctx.request.body;
     const result = await this.ctx.model.SystemUser.update({
       user_name: user_name,
-      dept_id: dept_id,
-      role_id: role_id,
+      dept_id: department,
+      role_id: role,
       email: email,
       phone: phone,
       status: status,
@@ -146,7 +148,11 @@ class ControlService extends Service {
   async roleList() { // 角色列表
     const result = await this.ctx.model.SystemRole.findAll({
       attributes: ['role_id', 'role_name', 'description', 'status'],
-      raw: true
+      raw: true,
+      include: [{
+        model: this.ctx.model.SystemRoleMenu,
+        attributes: ['menu_id']
+      }]
     })
     return result;
   }
@@ -157,32 +163,48 @@ class ControlService extends Service {
         'user_id', 'user_name', 'dept_id',
         'role_id', 'status', 'email', 'phone'
       ],
+      include: [
+        {
+          model: this.app.model.SystemRole,
+          attributes: ['role_name'],
+        },
+        {
+          model: this.app.model.SystemDept,
+          attributes: ['dept_name'],
+        }
+      ],
       raw: true
     })
     return result;
   }
 
-  async createRoleMenu(id) { // 映射'菜单-角色'关系
+  async createRoleMenu(id) { // 创建映射'菜单-角色'关系
     const {perms} = this.ctx.request.body;
-    let roleMenuList = [];
-    perms.map(item => {
-      let obj = {};
-      obj.role_id = id;
-      obj.menu_id = item;
-      roleMenuList.push(obj);
-    })
-    const result = await this.ctx.model.SystemRoleMenu.bulkCreate(
-      roleMenuList,
-      {timestamps: false, tableName: 'system_role_menu'}
-    );
+    const permsStr = perms.join(',');
+    const result = await this.ctx.model.SystemRoleMenu.create({
+      role_id: id,
+      menu_id: permsStr
+    });
+    const roleResult = result.get({plain: true});
+    return roleResult;
+  }
+
+  async updateRoleMenu() {
+    const {role_id, perms} = this.ctx.request.body;
+    const permsStr = perms.join(',');
+    const result = await this.ctx.model.SystemRoleMenu.update({
+      menu_id: permsStr
+    }, {
+      where: {"role_id": role_id}
+    });
     return result;
   }
 
   async createUserRole(id) {
-    const {role_id} = this.ctx.request.body;
+    const {role} = this.ctx.request.body;
     const result = await this.ctx.model.SystemUserRole.create({
       user_id: id,
-      role_id: role_id
+      role_id: role
     }, {
       timestamps: false,
       tableName: 'system_user_role'

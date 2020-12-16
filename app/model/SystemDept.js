@@ -12,8 +12,15 @@ module.exports = app => {
     modify_time: DATE,
   }, {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: false,
+    tableName: 'system_dept'
   });
+
+  SystemDept.associate = function() {
+    app.model.SystemDept.belongsTo(
+      app.model.SystemUser
+    )
+  }
 
   return SystemDept;
 }

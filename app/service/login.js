@@ -13,7 +13,7 @@ class LoginService extends Service {
   async createUser(pass) {
     const {
       user_name, email, phone,
-      status, dept_id, role_id
+      status, department, role
     } = this.ctx.request.body;
     const user = await this.ctx.model.SystemUser.create({
       user_name: user_name,
@@ -22,8 +22,8 @@ class LoginService extends Service {
       phone: phone,
       status: status,      
       password: pass,
-      dept_id: dept_id,
-      role_id: role_id,
+      dept_id: department,
+      role_id: role,
       create_name: this.ctx.session.user.user_name,
       create_time: new Date()
     }, {
@@ -56,14 +56,16 @@ class LoginService extends Service {
 
   // get user info
   async getUserInfo(info) {
-    const {ctx} = this
-    let userInfo = ""
-    const userResult = await this.ctx.model.SystemUser.findAll({
-      where: {"user_id": info.message.id},
-      raw: true
-    })
-    const user = userResult[0];
-    return user
+    if(info.verify === false) {
+      return null;
+    } else {
+      const userResult = await this.ctx.model.SystemUser.findAll({
+        where: {"user_id": info.message.id},
+        raw: true
+      })
+      const user = userResult[0];
+      return user
+    }
   }
 }
 

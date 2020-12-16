@@ -11,8 +11,19 @@ module.exports = app => {
     modify_time: DATE, // 变更时间
   }, {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: false,
+    tableName: 'system_role'
   });
+
+  SystemRole.associate = function() {
+    app.model.SystemRole.hasOne(
+      app.model.SystemRoleMenu,
+      {foreignKey: 'role_id'}
+    );
+    app.model.SystemRole.belongsTo(
+      app.model.SystemUser
+    )
+  }
 
   return SystemRole;
 }

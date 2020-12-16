@@ -1,4 +1,5 @@
 const {Controller} = require("egg");
+const { mapKeys } = require('lodash');
 const {convertTree} = require("../extend/treeUtils");
 
 class ControlController extends Controller {
@@ -51,7 +52,7 @@ class ControlController extends Controller {
     const result = await this.ctx.service.control.createRole(); // 创建角色回调
     if(Object.keys(result).length) {
       const res = await this.ctx.service.control.createRoleMenu(result.role_id); // 创建映射.菜单 - 角色
-      if(res.length) {
+      if(Object.keys(res).length) {
         results = {code: 0, msg: 'add role success'};
       } else {
         results = {code: 1, msg: 'add role failure'};
@@ -66,7 +67,12 @@ class ControlController extends Controller {
     let results = {}
     const result = await this.ctx.service.control.updateRole();
     if(result.length) {
-      results = {code: 0, msg: 'update role success'}
+      const res = await this.ctx.service.control.updateRoleMenu();
+      if(res.length) {
+        results = {code: 0, msg: 'update role success'}
+      } else {
+        results = {code: 1, msg: 'update role failure'}
+      }
     } else {
       results = {code: 1, msg: 'update role failure'}
     }
@@ -122,12 +128,18 @@ class ControlController extends Controller {
   async userList() { // 用户列表
     let results = {}
     const result = await this.ctx.service.control.userList()
-    // 查role_id对应的role_name 跟 dept_id对应的dept_name
+    const transRes = result && result.map(item => { // 转换对象键名
+      return mapKeys(item, (value, key) => {
+        if(key === 'system_role.role_name') return 'role_name';
+        if(key === 'system_dept.dept_name') return 'dept_name';
+        return key
+      })
+    });
     if(result.length) {
-      results = {code: 0, msg: 'query user success', data: result}
+      results = {code: 0, msg: 'query user success', data: transRes}
     } else {
       results = {code: 1, msg: 'query user failure'}
-    }
+    } 
     this.ctx.body = results
   }
 }

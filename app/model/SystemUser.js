@@ -13,7 +13,20 @@ module.exports = app => {
     modify_name: STRING, // 变更人名称
   }, {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: false,
+    tableName: 'system_user'
   });
+
+  SystemUser.associate = function() {
+    app.model.SystemUser.hasOne(
+      app.model.SystemRole,
+      {foreignKey: 'role_id', sourceKey: 'role_id'}
+    );
+    app.model.SystemUser.hasOne(
+      app.model.SystemDept,
+      {foreignKey: 'dept_id', sourceKey: 'dept_id'}
+    )
+  }
+
   return SystemUser;
 }

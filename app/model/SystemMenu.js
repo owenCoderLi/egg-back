@@ -17,7 +17,8 @@ module.exports = app => {
     modify_time: DATE, // 变更时间
   }, {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: false,
+    tableName: 'system_menu'
   });
 
   return SystemMenu;
