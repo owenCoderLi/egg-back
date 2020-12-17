@@ -1,4 +1,5 @@
 const {Service} = require("egg/index");
+const {Op} = require('sequelize');
 
 class LoginService extends Service {
   async findUsername(username) {
@@ -66,6 +67,24 @@ class LoginService extends Service {
       const user = userResult[0];
       return user
     }
+  }
+
+  // 获取菜单列表
+  async getUserMenu() {
+    const {role_id} = this.ctx.session.user;
+    const roleMenuRes = await this.ctx.model.SystemRoleMenu.findAll({
+      where: {"role_id": role_id},
+      raw: true
+    }) // 获取roleMenu对应的role_id集合
+    const {menu_id} = roleMenuRes[0];
+    const menuArr = menu_id.split(',');
+    const menuRes = await this.ctx.model.SystemMenu.findAll({
+      where: {
+        'menu_id': {[Op.or]: menuArr}
+      },
+      raw: true
+    }); // 获取menu中的所有匹配集合
+    return menuRes;
   }
 }
 

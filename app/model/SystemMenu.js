@@ -21,5 +21,6 @@ module.exports = app => {
     tableName: 'system_menu'
   });
 
+  SystemMenu.removeAttribute('id');
   return SystemMenu;
 }

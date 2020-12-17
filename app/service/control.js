@@ -92,8 +92,6 @@ class ControlService extends Service {
 
   async updateRole() { // 更新角色
     const {role_id, role_name, description, status} = this.ctx.request.body;
-    console.log('------------');
-    console.log(this.ctx.request.body);
     const result = await this.ctx.model.SystemRole.update({
       role_name: role_name,
       description: description,
@@ -130,7 +128,7 @@ class ControlService extends Service {
     const result = await this.ctx.model.SystemDept.findAll({
       attributes: ['dept_id', 'order_num', 'parent_id', 'status', 'dept_name'],
       raw: true
-    }); // array[{}, {}, ...]
+    });
     return result;
   }
 

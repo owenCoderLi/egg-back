@@ -13,7 +13,7 @@ module.exports = app => {
     app.model.SystemRoleMenu.belongsTo(
       app.model.SystemRole,
       {foreignKey: 'role_id'}
-    );
+    )
   }
 
   return SystemRoleMenu;

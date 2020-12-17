@@ -25,7 +25,7 @@ module.exports = app => {
     app.model.SystemUser.hasOne(
       app.model.SystemDept,
       {foreignKey: 'dept_id', sourceKey: 'dept_id'}
-    )
+    );
   }
 
   return SystemUser;

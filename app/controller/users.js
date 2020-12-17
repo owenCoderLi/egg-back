@@ -1,5 +1,7 @@
 const {Controller} = require("egg");
+const {omit} = require('lodash');
 const { cryptoMd5 } = require("../extend/helper");
+const {convertRoute} = require("../extend/treeUtils");
 
 class UserController extends Controller {
   async userLogin() { // 用户登录
@@ -48,6 +50,7 @@ class UserController extends Controller {
   async userInfo() { // 查询个人信息
     const token = await this.ctx.helper.getAccessToken()
     let verifyRes = {};
+    let userPerms = [];
     let results = {};
     await this.ctx.app.jwt.verify(token, this.ctx.app.config.jwt.secret, function(err, decoded) {
       if(err) {
@@ -60,21 +63,34 @@ class UserController extends Controller {
     })
     const userInfo = await this.ctx.service.login.getUserInfo(verifyRes)
     if(userInfo && Object.keys(userInfo).length) {
-      this.ctx.session.user = userInfo
-      results = {
-        code: 0, msg: 'success',
-        data: {
-          user_id: userInfo.user_id, user_name: userInfo.user_name,
-          dept_id: userInfo.dept_id, role_id: userInfo.role_id,
-          status: userInfo.status, phone: userInfo.phone,
-          email: userInfo.email, create_name: userInfo.create_name,
-          modify_name: userInfo.modify_name
+      this.ctx.session.user = userInfo; // 获取到用户个人信息
+      const userRes = omit(userInfo, ['password', 'create_name', 'modify_name']);
+      const res = await this.ctx.service.login.getUserMenu(); // 获取用户权限列表
+      if(res.length) {
+        res.map(item => {userPerms.push(item.perms)})
+        results = {
+          code: 0, msg: 'success',
+          data: { userInfo: userRes, perms: userPerms }
         }
+      } else {
+        results = { code: 1, msg: '暂无获取到个人信息' }
       }
     } else {
       results = { code: 1, msg: '暂无获取到个人信息' }
     }
     this.ctx.body = results;
+  }
+
+  async userRouteMenu() { // 查询个人菜单
+    let result = {};
+    const res = await this.ctx.service.login.getUserMenu();
+    if(res.length) {
+      const treeRes = convertRoute(res, 'menu'); // 转换成树
+      result = {code: 0, msg: 'query menu success', data: treeRes}
+    } else {
+      result = {code: 1, msg: 'query menu failure'};
+    }
+    this.ctx.body = result;
   }
 }
 

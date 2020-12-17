@@ -8,6 +8,7 @@ module.exports = app => {
   router.get('/api/user/info', controller.users.userInfo); // 查询个人信息
   router.post('/api/user/login', controller.users.userLogin); // 登录
   router.post('/api/user/register', controller.users.userRegister); // 注册(新增用户)
+  router.get('/api/user/route_menu', controller.users.userRouteMenu); // 获取当前用户路由信息
 
   router.get('/api/control/user_list', controller.controls.userList); // 用户列表
   router.post('/api/control/user_update', controller.controls.userUpdate); // 更新用户
