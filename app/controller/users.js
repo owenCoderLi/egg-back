@@ -5,10 +5,10 @@ const {convertRoute} = require("../extend/treeUtils");
 
 class UserController extends Controller {
   async userLogin() { // 用户登录
-    const {username, password} = this.ctx.request.body;
+    const {phone, password} = this.ctx.request.body;
     const keys = this.config.keys;
     let results = {}
-    const user = await this.ctx.service.login.findUsername(username);
+    const user = await this.ctx.service.login.findUsername(phone);
     if(!user || user.status === "2") {
       results = { code: 1, message: "用户名不存在" }
     } else {
@@ -67,7 +67,11 @@ class UserController extends Controller {
       const userRes = omit(userInfo, ['password', 'create_name', 'modify_name']);
       const res = await this.ctx.service.login.getUserMenu(); // 获取用户权限列表
       if(res.length) {
-        res.map(item => {userPerms.push(item.perms)})
+        res.map(item => {
+          const itemObj = {};
+          itemObj[item.perms] = item.path;
+          userPerms.push(itemObj);
+        })
         results = {
           code: 0, msg: 'success',
           data: { userInfo: userRes, perms: userPerms }

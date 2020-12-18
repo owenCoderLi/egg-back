@@ -2,9 +2,9 @@ const {Service} = require("egg/index");
 const {Op} = require('sequelize');
 
 class LoginService extends Service {
-  async findUsername(username) {
+  async findUsername(phone) {
     const user = await this.ctx.model.SystemUser.findAll({
-      where: {"user_name": username},
+      where: {"phone": phone},
       raw: true
     })
     const userResult = user[0];
