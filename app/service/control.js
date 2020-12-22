@@ -144,19 +144,25 @@ class ControlService extends Service {
   }
 
   async roleList() { // 角色列表
-    const result = await this.ctx.model.SystemRole.findAll({
+    const {page, pageSize} = this.ctx.query;
+    const start = (page - 1) * pageSize; // 起点量
+    const size = parseInt(pageSize); // 转换数字类型
+    const {count, rows} = await this.ctx.model.SystemRole.findAndCountAll({
       attributes: ['role_id', 'role_name', 'description', 'status'],
-      raw: true,
       include: [{
         model: this.ctx.model.SystemRoleMenu,
         attributes: ['menu_id']
-      }]
+      }],
+      offset: start, limit: size, raw: true
     })
-    return result;
+    return [count, rows];
   }
 
   async userList() { // 用户列表
-    const result = await this.ctx.model.SystemUser.findAll({
+    const {page, pageSize} = this.ctx.query;
+    const start = (page - 1) * pageSize; // 起点量
+    const size = parseInt(pageSize); // 转换数字类型
+    const {count, rows} = await this.ctx.model.SystemUser.findAndCountAll({
       attributes: [
         'user_id', 'user_name', 'dept_id',
         'role_id', 'status', 'email', 'phone'
@@ -171,9 +177,9 @@ class ControlService extends Service {
           attributes: ['dept_name'],
         }
       ],
-      raw: true
+      offset: start, limit: size, raw: true,
     })
-    return result;
+    return [count, rows];
   }
 
   async createRoleMenu(id) { // 创建映射'菜单-角色'关系

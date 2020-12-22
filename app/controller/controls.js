@@ -116,9 +116,9 @@ class ControlController extends Controller {
 
   async roleList() { // 角色列表
     let results = {}
-    const result = await this.ctx.service.control.roleList()
-    if(result.length) {
-      results = {code: 0, msg: 'query role success', data: result}
+    const [count, rows] = await this.ctx.service.control.roleList()
+    if(rows.length) {
+      results = {code: 0, msg: 'query role success', data: rows, total: count}
     } else {
       results = {code: 1, msg: 'query role failure'}
     }
@@ -127,16 +127,16 @@ class ControlController extends Controller {
 
   async userList() { // 用户列表
     let results = {}
-    const result = await this.ctx.service.control.userList()
-    const transRes = result && result.map(item => { // 转换对象键名
+    const [count, rows] = await this.ctx.service.control.userList()
+    const transRes = rows && rows.map(item => { // 转换对象键名
       return mapKeys(item, (value, key) => {
         if(key === 'system_role.role_name') return 'role_name';
         if(key === 'system_dept.dept_name') return 'dept_name';
         return key
       })
     });
-    if(result.length) {
-      results = {code: 0, msg: 'query user success', data: transRes}
+    if(rows.length) {
+      results = {code: 0, msg: 'query user success', data: transRes, total: count}
     } else {
       results = {code: 1, msg: 'query user failure'}
     } 
