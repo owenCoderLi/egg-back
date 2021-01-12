@@ -18,10 +18,10 @@ class UserController extends Controller {
       } else if(user.status === "0") {
         results = { code: 1, message: "该账号已被禁用,请联系管理员" }
       } else {
-        const refresh_token = await this.ctx.helper.createToken({ id: user.user_id }, "7", "days")
+        // const refresh_token = await this.ctx.helper.createToken({ id: user.user_id }, "7", "days")
         const access_token = await this.ctx.helper.createToken({ id: user.user_id }, "2", "hours")
-        const uid = user.user_id
-        await this.ctx.service.login.saveToken({ uid, access_token, refresh_token })
+        // const uid = user.user_id
+        // await this.ctx.service.login.saveToken({ uid, access_token, refresh_token })
         results = { code: 0, data: { access_token } }
       }
     }

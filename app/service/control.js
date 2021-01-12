@@ -35,16 +35,16 @@ class ControlService extends Service {
 
   async createMenu() { // 新增菜单
     const {
-      order, id = 0, path, status, type, url,
+      order, parent_id = 0, status, type, url,
       name, component, perms, icon,
     } = this.ctx.request.body;
     const result = await this.ctx.model.SystemMenu.create({
-      order_num: order, parent_id: id,
+      order_num: order, parent_id: parent_id,
       status: status, types: type,
       create_name: this.ctx.session.user.user_name,
       menu_name: name,
       component: component,
-      perms: perms, path: path,
+      perms: perms,
       path: url,
       icon: icon, create_time: new Date()
     }, {
@@ -57,17 +57,21 @@ class ControlService extends Service {
 
   async updateMenu() { // 更新菜单
     const {
-      id, order_num, parent_id, path, status, types,
-      menu_name, component, perms, icon,
+      id, order, parent_id = 0, url, status = false, type,
+      name, component, perms, icon,
     } = this.ctx.request.body;
     const result = await this.ctx.model.SystemMenu.update({
-      order_num: order_num, parent_id: parent_id,
-      status: status, types: types,
+      order_num: order,
+      parent_id: parent_id,
+      status: status,
+      types: type,
       modify_name: this.ctx.session.user.user_name,
-      menu_name: menu_name,
+      menu_name: name,
       component: component,
-      perms: perms, path: path,
-      icon: icon, modify_time: new Date()
+      perms: perms,
+      path: url,
+      icon: icon,
+      modify_time: new Date()
     },{
       where: { "menu_id": id }
     });
@@ -144,8 +148,8 @@ class ControlService extends Service {
   }
 
   async roleList() { // 角色列表
-    const {page, pageSize} = this.ctx.query;
-    const start = (page - 1) * pageSize; // 起点量
+    const {current = 1, pageSize = 20} = this.ctx.query;
+    const start = (current - 1) * pageSize; // 起点量
     const size = parseInt(pageSize); // 转换数字类型
     const {count, rows} = await this.ctx.model.SystemRole.findAndCountAll({
       attributes: ['role_id', 'role_name', 'description', 'status'],
@@ -159,8 +163,8 @@ class ControlService extends Service {
   }
 
   async userList() { // 用户列表
-    const {page, pageSize} = this.ctx.query;
-    const start = (page - 1) * pageSize; // 起点量
+    const {current = 1, pageSize = 20} = this.ctx.query;
+    const start = (current - 1) * pageSize; // 起点量
     const size = parseInt(pageSize); // 转换数字类型
     const {count, rows} = await this.ctx.model.SystemUser.findAndCountAll({
       attributes: [
